@@ -2,9 +2,12 @@
 
 ## Purpose and Scope
 
-This document describes the Databricks sensor-data pipeline implemented by `pl_sensor_data.yml`, `ingest_files.py`, `clean_data.py`, and `gold_data.py`. It covers the current behavior, data flow, outputs, operational assumptions, and known limitations.
-
-The assignment asks the pipeline to ingest two source folders, combine the datasets, handle data-quality errors, and present the average of the top one-third of sensor values. The extended requirement asks that the solution scale to a much larger dataset, potentially over 500 GB, when compute is scaled up.
+Task : 
+1.Ingest two source folders
+2.combine the datasets
+3.handle data-quality errors
+4.present the average of the top one-third of sensor values. 
+5.The extended requirement asks that the solution scale to a much larger dataset, potentially over 500 GB, when compute is scaled up.
 
 ## Technology Stack and Features
 
