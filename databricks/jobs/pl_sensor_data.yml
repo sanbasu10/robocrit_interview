@@ -1,0 +1,54 @@
+resources:
+  jobs:
+    pl_sensor_data:
+      name: pl_sensor_data
+      tasks:
+        - task_key: csv_ingest
+          notebook_task:
+            notebook_path: /Workspace/Users/santanu103basu@gmail.com/robocrit_task/databricks/notebooks/bronze/ingest_files
+            base_parameters:
+              file_type: csv
+              file_path: /Volumes/robocrit/robocrit_ingest_{env}/landing/data_source_1/
+            source: WORKSPACE
+        - task_key: csv_silver
+          depends_on:
+            - task_key: csv_ingest
+          notebook_task:
+            notebook_path: /Workspace/Users/santanu103basu@gmail.com/robocrit_task/databricks/notebooks/silver/clean_data
+            base_parameters:
+              table: csv_sensor_data
+            source: WORKSPACE
+        - task_key: json_ingest
+          notebook_task:
+            notebook_path: /Workspace/Users/santanu103basu@gmail.com/robocrit_task/databricks/notebooks/bronze/ingest_files
+            base_parameters:
+              file_type: json
+              file_path: /Volumes/robocrit/robocrit_ingest_{env}/landing/data_source_2/
+            source: WORKSPACE
+        - task_key: json_silver
+          depends_on:
+            - task_key: json_ingest
+          notebook_task:
+            notebook_path: /Workspace/Users/santanu103basu@gmail.com/robocrit_task/databricks/notebooks/silver/clean_data
+            base_parameters:
+              table: json_sensor_data
+            source: WORKSPACE
+        - task_key: gold_layer
+          depends_on:
+            - task_key: csv_silver
+            - task_key: json_silver
+          notebook_task:
+            notebook_path: /Workspace/Users/santanu103basu@gmail.com/robocrit_task/databricks/notebooks/gold/gold_data
+            source: WORKSPACE
+      queue:
+        enabled: true
+      parameters:
+        - name: checkpoint_path
+          default: /Volumes/robocrit/robocrit_bronze_{env}/checkpoints
+        - name: clear_data
+          default: "0"
+        - name: env
+          default: prod
+        - name: schema_path
+          default: /Volumes/robocrit/robocrit_bronze_{env}/schemapaths
+      performance_target: PERFORMANCE_OPTIMIZED
