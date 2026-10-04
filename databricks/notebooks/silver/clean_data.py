@@ -31,10 +31,6 @@ table
 
 # COMMAND ----------
 
-
-
-# COMMAND ----------
-
 spark.sql(f"""
 create table if not exists robocrit.robocrit_silver_{env}.{table}
 (
@@ -96,7 +92,7 @@ select * from
 FROM robocrit.robocrit_bronze_{env}.{table} 
 where cast(batch_id as bigint) > (select coalesce(max(cast(batch_id as bigint)),0) from robocrit.robocrit_silver_{env}.{table})
 and _rescued_data is null
-and try_to_timestamp(yyyymmdd, 'yyyyMMdd') is not null
+and try_to_timestamp(string(yyyymmdd), 'yyyyMMdd') is not null
 )
 where sensor_number is not null
 and sensor_value is not null
@@ -122,7 +118,7 @@ select
     case when clean_sensor_number is null then 'invalid_sensor_number' end,
     case when clean_sensor_value is null then 'invalid_sensor_value' end,
     case when _rescued_data is not null then 'schema_rescue' end,
-    case when try_to_timestamp(yyyymmdd, 'yyyyMMdd') is null then 'invalid_source_folder_date' end
+    case when try_to_timestamp(string(yyyymmdd), 'yyyyMMdd') is null then 'invalid_source_folder_date' end
   ) as corruption_reason
 from              
 (SELECT
@@ -145,7 +141,7 @@ where clean_sensor_number is  null
 or clean_sensor_value is  null
 or clean_event_date is  null
 or _rescued_data is not null
-or try_to_timestamp(yyyymmdd, 'yyyyMMdd') is null
+or try_to_timestamp(string(yyyymmdd), 'yyyyMMdd') is null
 
 """))
 
@@ -156,5 +152,3 @@ display(spark.sql(f"""select * from robocrit.robocrit_silver_{env}.{table} limit
 # COMMAND ----------
 
 display(spark.sql(f"""select * from robocrit.robocrit_silver_{env}.{table}_corrupted limit 10"""))
-
-# COMMAND ----------

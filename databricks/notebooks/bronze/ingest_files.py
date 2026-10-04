@@ -8,6 +8,11 @@ from pyspark.sql import functions as F
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC
+
+# COMMAND ----------
+
 # dbutils.widgets.text('env','prod')
 
 # dbutils.widgets.text('schema_path',"/Volumes/robocrit/robocrit_bronze_{env}/schemapaths")
@@ -74,10 +79,6 @@ spark.sql(f"""
 
 # COMMAND ----------
 
-
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC Creating Table Specific Schema Location within the Main Schema Path
 
@@ -92,21 +93,6 @@ dbutils.fs.ls(schema_path)
 # COMMAND ----------
 
 dbutils.fs.ls(file_path)
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC Fetch Max Batch ID 
-
-# COMMAND ----------
-
-# from pyspark.sql import functions as F
-# try:
-#     max_batch_id =  spark.sql(f"select max(batch_id) from {full_table}").collect()[0][0]
-# except:
-#     max_batch_id = 0
-
-# print("max_batch_id : ",max_batch_id)
 
 # COMMAND ----------
 
@@ -135,8 +121,6 @@ def add_batch_and_partition(df, epoch_id ):
        .mode("append")
        .partitionBy("yyyymmdd", "batch_id")
        .option("optimizeWrite", "true")
-       .option("txnAppId", full_table)
-       .option("txnVersion", epoch_id)
        .saveAsTable(full_table))
 
 # COMMAND ----------
@@ -179,5 +163,3 @@ full_table
 # COMMAND ----------
 
 display(spark.sql(f"select * from {full_table} limit 10"))
-
-# COMMAND ----------

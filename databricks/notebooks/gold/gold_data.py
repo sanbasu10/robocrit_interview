@@ -4,7 +4,7 @@
 # COMMAND ----------
 
 # dbutils.widgets.text('env','prod')
-dbutils.widgets.text('clear_data','1')
+# dbutils.widgets.text('clear_data','0')
 
 # COMMAND ----------
 

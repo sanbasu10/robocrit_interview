@@ -1,16 +1,17 @@
 # Databricks notebook source
-clear_data='1'
-if clear_data=='1':
-    env='prod'
-    dbutils.fs.rm('/Volumes/robocrit/robocrit_bronze_prod/checkpoints/csv_sensor_data',True)
-    dbutils.fs.rm('/Volumes/robocrit/robocrit_bronze_prod/checkpoints/json_sensor_data',True)
-    dbutils.fs.rm('/Volumes/robocrit/robocrit_bronze_prod/schemapaths/csv_sensor_data',True)
-    dbutils.fs.rm('/Volumes/robocrit/robocrit_bronze_prod/schemapaths/json_sensor_data',True)
-    tables=['robocrit_bronze_prod.csv_sensor_data','robocrit_bronze_prod.json_sensor_data','robocrit_silver_prod.csv_sensor_data','robocrit_silver_prod.json_sensor_data','robocrit_silver_prod.json_sensor_data_corrupted','robocrit_silver_prod.csv_sensor_data_corrupted','robocrit_gold_prod.combined_sensor_data']
-    for table in tables:
-        display(spark.sql(f"delete from robocrit.{table}"))
-        print(f"Deleted table {table}")
-    print("Deleted all tables")
+# clear_data='1'
+# if clear_data=='1':
+#     env='prod'
+#     dbutils.fs.rm('/Volumes/robocrit/robocrit_bronze_prod/checkpoints/csv_sensor_data',True)
+#     dbutils.fs.rm('/Volumes/robocrit/robocrit_bronze_prod/checkpoints/json_sensor_data',True)
+#     dbutils.fs.rm('/Volumes/robocrit/robocrit_bronze_prod/schemapaths/csv_sensor_data',True)
+#     dbutils.fs.rm('/Volumes/robocrit/robocrit_bronze_prod/schemapaths/json_sensor_data',True)
+#     tables=['robocrit_bronze_prod.csv_sensor_data','robocrit_bronze_prod.json_sensor_data','robocrit_silver_prod.csv_sensor_data','robocrit_silver_prod.json_sensor_data','robocrit_silver_prod.json_sensor_data_corrupted','robocrit_silver_prod.csv_sensor_data_corrupted','robocrit_gold_prod.combined_sensor_data']
+#     for table in tables:
+#         display(spark.sql(f"delete from robocrit.{table}"))
+#         print(f"Deleted table {table}")
+#         spark.sql(f"drop table if exists robocrit.{table}")
+#     print("Deleted all tables")
 
 # COMMAND ----------
 
@@ -30,11 +31,11 @@ for d in files :
 
 # COMMAND ----------
 
-date_partitions = ["20260102","20260103","20260104","20260105","20260106","20260107","20260108","20260109","20260110",]
-min_files = 10
-max_files = 15
-min_rows = 1000000
-max_rows = 2000000
+date_partitions = ["20260101",]
+min_files = 1
+max_files = 3
+min_rows = 100000
+max_rows = 200000
 
 # COMMAND ----------
 
