@@ -99,7 +99,7 @@ The checkpoint is source-specific (`{checkpoint_path}/{target_table}`) and is re
 
 The valid table converts `event_date` using several timestamp formats, casts `sensor_number` to integer, and casts `sensor_value` to `DECIMAL(20,16)`. It excludes records with invalid converted fields, a non-null `_rescued_data`, or an invalid source-folder date.
 
-Rows with failed field conversions, rescued data, or an invalid source-folder date are inserted into the corrupted table. The table retains the original sensor fields and metadata, the `_rescued_data` payload, and a semicolon-separated `corruption_reason` value. Reason codes include `invalid_event_date`, `invalid_sensor_number`, `invalid_sensor_value`, `schema_rescue`, and `invalid_source_folder_date`; a row can have more than one reason. The script adds the two quarantine columns to an existing table when they are missing, preserving prior quarantined rows; those older rows have null values for the newly added columns.
+Rows with failed field conversions, rescued data, or an invalid source-folder date are inserted into the corrupted table. The table retains the original sensor fields and metadata, the `_rescued_data` payload, and a semicolon-separated `corruption_reason` value. 
 
 Both silver tables are partitioned by `yyyymmdd` and `batch_id`. Incremental selection compares numeric casts of `batch_id` to the maximum batch ID in the destination table. Valid and corrupted rows use separate destination watermarks.
 
