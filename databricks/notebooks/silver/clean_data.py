@@ -147,8 +147,10 @@ or try_to_timestamp(string(yyyymmdd), 'yyyyMMdd') is null
 
 # COMMAND ----------
 
+spark.sql(f"optimize table robocrit.robocrit_silver_{env}.{table}")
 display(spark.sql(f"""select * from robocrit.robocrit_silver_{env}.{table} limit 10"""))
 
 # COMMAND ----------
 
+spark.sql(f"optimize table robocrit.robocrit_silver_{env}.{table}")
 display(spark.sql(f"""select * from robocrit.robocrit_silver_{env}.{table}_corrupted limit 10"""))

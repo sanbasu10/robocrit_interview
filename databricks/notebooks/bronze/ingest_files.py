@@ -161,5 +161,5 @@ query.awaitTermination()
 full_table
 
 # COMMAND ----------
-
+spark.sql(f"optimize table {full_table}")
 display(spark.sql(f"select * from {full_table} limit 10"))

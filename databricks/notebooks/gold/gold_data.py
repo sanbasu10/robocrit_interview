@@ -72,7 +72,7 @@ load_gold_table('json')
 # MAGIC overall average of top 1/3 sensor value across all sensors
 
 # COMMAND ----------
-
+spark.sql(f"optimize table robocrit.robocrit_gold_{env}.combined_sensor_data")
 display(spark.sql(f"""select avg(sensor_value)  as avg_sensor_value from
 (select sensor_number,sensor_value from
 (SELECT
