@@ -127,22 +127,17 @@ def add_batch_and_partition(df, epoch_id ):
     # global max_batch_id
     batch_id = epoch_id + 1
     df = (df.withColumn("yyyymmdd", F.regexp_extract(F.col("_metadata.file_path"), r"([^/]+)/[^/]+$", 1))
-          .withColumn("yyyymmdd", F.col("yyyymmdd").cast("int"))
           .withColumn("load_date", F.current_timestamp())
           .withColumn("batch_id", F.lit(batch_id))
          )
-    
-    len_corrupt_yyyymmdd=df.filter(F.length(F.col("yyyymmdd").cast("string")) != 8).count()
-    
-    corrupt_count = df.filter(F.col("_rescued_data").isNotNull()).count()
 
-    if len_corrupt_yyyymmdd > 0:
-        raise Exception(f"Found {corrupt_count} records in a folder which doesnot follow yyyyMMdd format. Please fix the data and re-ingest.")
-
-    if corrupt_count > 0:
-        raise Exception(f"Found {corrupt_count} corrupt records . Please fix the data and re-ingest.")
-
-    df.write.format("delta").mode("append").partitionBy("yyyymmdd","batch_id").option("optimizeWrite", "true").saveAsTable(full_table)
+    (df.write.format("delta")
+       .mode("append")
+       .partitionBy("yyyymmdd", "batch_id")
+       .option("optimizeWrite", "true")
+       .option("txnAppId", full_table)
+       .option("txnVersion", epoch_id)
+       .saveAsTable(full_table))
 
 # COMMAND ----------
 
@@ -159,6 +154,8 @@ df_raw = (spark.readStream
           .format("cloudFiles")
           .option("cloudFiles.format", file_type)
           .option("cloudFiles.schemaLocation", f"{schema_path}/{target_table}")
+          .option("cloudFiles.schemaEvolutionMode", "rescue")
+          .option("rescuedDataColumn", "_rescued_data")
         #   .option("cloudFiles.useManagedFileEvents", "true")
           .option("cloudFiles.maxFilesPerTrigger", "1000")     # tune based on cluster
           .option("cloudFiles.maxBytesPerTrigger", "50g")      # ~50 GB per micro-batch
@@ -169,7 +166,7 @@ df_raw = (spark.readStream
 query = (df_raw
          .writeStream
          .foreachBatch(add_batch_and_partition)
-         .trigger(once=True)
+         .trigger(availableNow=True)
          .option("checkpointLocation", f"{checkpoint_path}/{target_table}")
          .start())
 
@@ -184,5 +181,3 @@ full_table
 display(spark.sql(f"select * from {full_table} limit 10"))
 
 # COMMAND ----------
-
-display(spark.sql(f"select count(1),batch_id,yyyymmdd from {full_table} group by yyyymmdd,batch_id order by yyyymmdd,batch_id"))
